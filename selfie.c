@@ -10275,7 +10275,7 @@ int main(int argc, char** argv) {
 
   init_system();
 
-  printf1("selfie-path: This is %s's Selfie!", my_name);
+  printf2("%s: This is %s's Selfie!", selfie_name, my_name);
   println();
 
   exit_code = selfie(0);
