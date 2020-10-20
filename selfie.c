@@ -1942,6 +1942,8 @@ void turn_on_gc_library(uint64_t period, char* name);
 
 char* selfie_name = (char*) 0; // name of running selfie executable
 
+char* my_name = (char*) 0; // name of the student 
+
 uint64_t BOOTLEVELZERO = 0; // flag for indicating boot level
 
 uint64_t WINDOWS = 0; // indicates if we are likely running on Windows
@@ -1953,6 +1955,8 @@ void init_selfie(uint64_t argc, uint64_t* argv) {
   selfie_argv = argv;
 
   selfie_name = get_argument();
+
+  my_name = "Ganna Shulika";
 }
 
 void init_system() {
@@ -10268,6 +10272,9 @@ int main(int argc, char** argv) {
   init_library();
 
   init_system();
+
+  printf1("selfie-path: This is %s's Selfie!", my_name);
+  println();
 
   exit_code = selfie(0);
 
