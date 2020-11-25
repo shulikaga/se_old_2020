@@ -110,6 +110,7 @@ void reset_library();
 
 uint64_t two_to_the_power_of(uint64_t p);
 uint64_t ten_to_the_power_of(uint64_t p);
+uint64_t sixteen_to_the_power_of(uint64_t p);
 
 uint64_t log_ten(uint64_t n);
 
@@ -139,6 +140,7 @@ char*    string_copy(char* s);
 void     string_reverse(char* s);
 uint64_t string_compare(char* s, char* t);
 
+uint64_t htoi(char* s);
 uint64_t atoi(char* s);
 char*    itoa(uint64_t n, char* s, uint64_t b, uint64_t d, uint64_t a);
 
@@ -226,6 +228,7 @@ uint64_t CHAR_EXCLAMATION  = '!';
 uint64_t CHAR_LT           = '<';
 uint64_t CHAR_GT           = '>';
 uint64_t CHAR_BACKSLASH    =  92; // ASCII code 92 = backslash
+uint64_t CHAR_RISCU_DOT    = '.';
 
 uint64_t* character_buffer; // buffer for reading and writing characters
 
@@ -346,11 +349,13 @@ uint64_t find_next_character();
 
 uint64_t is_character_letter();
 uint64_t is_character_digit();
+uint64_t is_character_digit();
 uint64_t is_character_letter_or_digit_or_underscore();
 uint64_t is_character_not_double_quote_or_new_line_or_eof();
 
 uint64_t identifier_string_match(uint64_t string_index);
 uint64_t identifier_or_keyword();
+uint64_t riscu_instruction_or_register_name();
 
 void get_symbol();
 
@@ -397,11 +402,68 @@ uint64_t SYM_INT      = 28; // int
 uint64_t SYM_CHAR     = 29; // char
 uint64_t SYM_UNSIGNED = 30; // unsigned
 
+//RISCU symbols
+uint64_t SYM_RISCU_COMMA             = 31;  // ,
+uint64_t SYM_RISCU_LPARENTHESIS      = 32;  // (
+uint64_t SYM_RISCU_RPARENTHESIS      = 33;  // )
+uint64_t SYM_RISCU_LUI               = 34;  // lui
+uint64_t SYM_RISCU_ADDI              = 35;  // addi
+uint64_t SYM_RISCU_LD                = 36;  // ld
+uint64_t SYM_RISCU_SD                = 37;  // sd
+uint64_t SYM_RISCU_ADD               = 38;  // add
+uint64_t SYM_RISCU_SUB               = 39;  // sub
+uint64_t SYM_RISCU_MUL               = 40;  // mul
+uint64_t SYM_RISCU_DIVU              = 41; // divu
+uint64_t SYM_RISCU_REMU              = 42; // remu
+uint64_t SYM_RISCU_SLTU              = 43; // sltu
+uint64_t SYM_RISCU_BEQ               = 44; // beq
+uint64_t SYM_RISCU_JAL               = 45; // jal
+uint64_t SYM_RISCU_JALR              = 46; // jalr
+uint64_t SYM_RISCU_ECALL             = 47; // ecall
+uint64_t SYM_RISCU_REG_ZR            = 48; // zero
+uint64_t SYM_RISCU_REG_RA            = 49; // ra
+uint64_t SYM_RISCU_REG_SP            = 50; // sp
+uint64_t SYM_RISCU_REG_GP            = 51; // gp
+uint64_t SYM_RISCU_REG_TP            = 52; // tp
+uint64_t SYM_RISCU_REG_T0            = 53; // t0
+uint64_t SYM_RISCU_REG_T1            = 54; // t1
+uint64_t SYM_RISCU_REG_T2            = 55; // t2
+uint64_t SYM_RISCU_REG_S0            = 56; // s0
+uint64_t SYM_RISCU_REG_S1            = 57; // s1
+uint64_t SYM_RISCU_REG_A0            = 58; // a0
+uint64_t SYM_RISCU_REG_A1            = 59; // a1
+uint64_t SYM_RISCU_REG_A2            = 60; // a2
+uint64_t SYM_RISCU_REG_A3            = 61; // a3
+uint64_t SYM_RISCU_REG_A4            = 62; // a4
+uint64_t SYM_RISCU_REG_A5            = 63; // a5
+uint64_t SYM_RISCU_REG_A6            = 64; // a6
+uint64_t SYM_RISCU_REG_A7            = 65; // a7
+uint64_t SYM_RISCU_REG_S2            = 66; // s2   
+uint64_t SYM_RISCU_REG_S3            = 67; // s3 
+uint64_t SYM_RISCU_REG_S4            = 68; // s4   
+uint64_t SYM_RISCU_REG_S5            = 69; // s5   
+uint64_t SYM_RISCU_REG_S6            = 70; // s6   
+uint64_t SYM_RISCU_REG_S7            = 71; // s7     
+uint64_t SYM_RISCU_REG_S8            = 72; // s8      
+uint64_t SYM_RISCU_REG_S9            = 73; // s9  
+uint64_t SYM_RISCU_REG_S10           = 74; // s10  
+uint64_t SYM_RISCU_REG_S11           = 75; // s11     
+uint64_t SYM_RISCU_REG_T3            = 76; // t3  
+uint64_t SYM_RISCU_REG_T4            = 77; // t4      
+uint64_t SYM_RISCU_REG_T5            = 78; // t5     
+uint64_t SYM_RISCU_REG_T6            = 79; // t6  
+uint64_t SYM_RISCU_QUAD              = 80; //.quad
+
+uint64_t NOT_REG_ID                  = 81;
+
+
 uint64_t* SYMBOLS; // strings representing symbols
 
 uint64_t MAX_IDENTIFIER_LENGTH = 64;  // maximum number of characters in an identifier
 uint64_t MAX_INTEGER_LENGTH    = 20;  // maximum number of characters in an unsigned integer
 uint64_t MAX_STRING_LENGTH     = 128; // maximum number of characters in a string
+
+uint64_t MAX_HEXADECIMAL_LENGTH = 18;  // maximum number of characters in an hexadecimal number
 
 // ------------------------ GLOBAL VARIABLES -----------------------
 
@@ -431,7 +493,7 @@ uint64_t source_fd   = 0; // file descriptor of open source file
 // ------------------------- INITIALIZATION ------------------------
 
 void init_scanner () {
-  SYMBOLS = smalloc((SYM_UNSIGNED + 1) * SIZEOFUINT64STAR);
+  SYMBOLS = smalloc((SYM_RISCU_QUAD + 1) * SIZEOFUINT64STAR);
 
   *(SYMBOLS + SYM_INTEGER)      = (uint64_t) "integer";
   *(SYMBOLS + SYM_CHARACTER)    = (uint64_t) "character";
@@ -465,6 +527,58 @@ void init_scanner () {
   *(SYMBOLS + SYM_INT)      = (uint64_t) "int";
   *(SYMBOLS + SYM_CHAR)     = (uint64_t) "char";
   *(SYMBOLS + SYM_UNSIGNED) = (uint64_t) "unsigned";
+
+  *(SYMBOLS + SYM_RISCU_COMMA)         = (uint64_t) ",";
+  *(SYMBOLS + SYM_RISCU_LPARENTHESIS)  = (uint64_t) "(";
+  *(SYMBOLS + SYM_RISCU_RPARENTHESIS)  = (uint64_t) ")";
+  *(SYMBOLS + SYM_RISCU_LUI)           = (uint64_t) "lui";
+  *(SYMBOLS + SYM_RISCU_ADDI)          = (uint64_t) "addi";
+  *(SYMBOLS + SYM_RISCU_LD)            = (uint64_t) "ld";
+  *(SYMBOLS + SYM_RISCU_SD)            = (uint64_t) "sd";
+  *(SYMBOLS + SYM_RISCU_ADD)           = (uint64_t) "add";
+  *(SYMBOLS + SYM_RISCU_SUB)           = (uint64_t) "sub";
+  *(SYMBOLS + SYM_RISCU_MUL)           = (uint64_t) "mul";
+  *(SYMBOLS + SYM_RISCU_DIVU)          = (uint64_t) "divu";
+  *(SYMBOLS + SYM_RISCU_REMU)          = (uint64_t) "remu";
+  *(SYMBOLS + SYM_RISCU_SLTU)          = (uint64_t) "sltu";
+  *(SYMBOLS + SYM_RISCU_BEQ)           = (uint64_t) "beq";
+  *(SYMBOLS + SYM_RISCU_JAL)           = (uint64_t) "jal";
+  *(SYMBOLS + SYM_RISCU_JALR)          = (uint64_t) "jalr";
+  *(SYMBOLS + SYM_RISCU_ECALL)         = (uint64_t) "ecall";
+  *(SYMBOLS + SYM_RISCU_REG_ZR)        = (uint64_t) "zero";
+  *(SYMBOLS + SYM_RISCU_REG_RA)        = (uint64_t) "ra";
+  *(SYMBOLS + SYM_RISCU_REG_SP)        = (uint64_t) "sp";
+  *(SYMBOLS + SYM_RISCU_REG_GP)        = (uint64_t) "gp";
+  *(SYMBOLS + SYM_RISCU_REG_TP)        = (uint64_t) "tp";
+  *(SYMBOLS + SYM_RISCU_REG_T0)        = (uint64_t) "t0";
+  *(SYMBOLS + SYM_RISCU_REG_T1)        = (uint64_t) "t1";
+  *(SYMBOLS + SYM_RISCU_REG_T2)        = (uint64_t) "t2";
+  *(SYMBOLS + SYM_RISCU_REG_S0)        = (uint64_t) "s0";
+  *(SYMBOLS + SYM_RISCU_REG_S1)        = (uint64_t) "s1";
+  *(SYMBOLS + SYM_RISCU_REG_A0)        = (uint64_t) "a0";
+  *(SYMBOLS + SYM_RISCU_REG_A1)        = (uint64_t) "a1";
+  *(SYMBOLS + SYM_RISCU_REG_A2)        = (uint64_t) "a2";
+  *(SYMBOLS + SYM_RISCU_REG_A3)        = (uint64_t) "a3";
+  *(SYMBOLS + SYM_RISCU_REG_A4)        = (uint64_t) "a4";
+  *(SYMBOLS + SYM_RISCU_REG_A5)        = (uint64_t) "a5";
+  *(SYMBOLS + SYM_RISCU_REG_A6)        = (uint64_t) "a6";
+  *(SYMBOLS + SYM_RISCU_REG_A7)        = (uint64_t) "a7";
+  *(SYMBOLS + SYM_RISCU_REG_S2)        = (uint64_t) "s2";
+  *(SYMBOLS + SYM_RISCU_REG_S3)        = (uint64_t) "s3";
+  *(SYMBOLS + SYM_RISCU_REG_S4)        = (uint64_t) "s4";  
+  *(SYMBOLS + SYM_RISCU_REG_S5)        = (uint64_t) "s5"; 
+  *(SYMBOLS + SYM_RISCU_REG_S6)        = (uint64_t) "s6";
+  *(SYMBOLS + SYM_RISCU_REG_S7)        = (uint64_t) "s7";
+  *(SYMBOLS + SYM_RISCU_REG_S8)        = (uint64_t) "s8";
+  *(SYMBOLS + SYM_RISCU_REG_S9)        = (uint64_t) "s9";
+  *(SYMBOLS + SYM_RISCU_REG_S10)       = (uint64_t) "s10";     
+  *(SYMBOLS + SYM_RISCU_REG_S11)       = (uint64_t) "s11";        
+  *(SYMBOLS + SYM_RISCU_REG_T3)        = (uint64_t) "t3";  
+  *(SYMBOLS + SYM_RISCU_REG_T4)        = (uint64_t) "t4"; 
+  *(SYMBOLS + SYM_RISCU_REG_T5)        = (uint64_t) "t5";   
+  *(SYMBOLS + SYM_RISCU_REG_T6)        = (uint64_t) "t6"; 
+  *(SYMBOLS + SYM_RISCU_QUAD)          = (uint64_t) ".quad"; 
+
 
   character = CHAR_EOF;
   symbol    = SYM_EOF;
@@ -1350,6 +1464,33 @@ void print_instruction();
 
 void selfie_disassemble(uint64_t verbose);
 
+// -----------------------------------------------------------------
+// -------------------------- ASSEMBLER -------------------------
+// -----------------------------------------------------------------
+
+void selfie_assemble();
+void parse_riscu();
+void get_instruction();
+
+void parse_init_instruction();
+void parse_memory_instruction();
+void parse_arithmetic_or_comparison_instruction();
+void parse_control_instruction();
+void parse_system_instruction();
+uint64_t parse_memory_address();
+void parse_system_instruction();
+void parse_data_segment();
+
+uint64_t is_init_instruction();
+uint64_t is_memory_instruction();
+uint64_t is_arithmetic_or_comparison_instruction();
+uint64_t is_control_instruction();
+uint64_t is_system_instruction();
+uint64_t is_data_segment_keyword();
+uint64_t get_register_id();
+
+
+
 // ------------------------ GLOBAL VARIABLES -----------------------
 
 char*    assembly_name = (char*) 0; // name of assembly file
@@ -2008,6 +2149,15 @@ uint64_t ten_to_the_power_of(uint64_t p) {
     return ten_to_the_power_of(p - 1) * 10;
 }
 
+uint64_t sixteen_to_the_power_of(uint64_t p) {
+  // use recursion for simplicity and educational value
+  // for p close to 0 performance is not relevant
+  if (p == 0)
+    return 1;
+  else
+    return sixteen_to_the_power_of(p - 1) * 16;
+}
+
 uint64_t log_ten(uint64_t n) {
   // use recursion for simplicity and educational value
   // for n < 1000000 performance is not relevant
@@ -2224,6 +2374,70 @@ uint64_t string_compare(char* s, char* t) {
       i = i + 1;
     else
       return 0;
+}
+
+uint64_t htoi(char* s){
+  uint64_t i;
+  uint64_t j;
+  uint64_t n;
+  uint64_t c;
+ 
+  // and the numerical value 0 for n
+  n = 0;
+   // the conversion of the ASCII hexadecimal string in s to its
+   // numerical value n begins with the leftmost digit in s
+  i = string_length(s) - 1;
+  j = 0;
+
+  // load character (one byte) at index i in s from memory requires
+  // bit shifting since memory access can only be done in double words
+  c = load_character(s, i);
+ 
+      // loop until s is terminated
+      while (c != 'x') {
+        // the numerical value of ASCII-encoded hexadecimal digits
+        // is offset by the ASCII code of '0' (which is 48)
+        c = c - '0';
+
+        if (c > 9) {//9
+          if(c < 17){//A
+          printf2("%s: cannot convert  c < 17 non-hexadecimal number %s\n", selfie_name, s);
+          exit(EXITCODE_SCANNERERROR);
+
+          }else if (c > 22){//F
+            printf2("%s: cannot convert  c > 22 non-hexadecimal number %s\n", selfie_name, s);
+            exit(EXITCODE_SCANNERERROR);
+          }else{//A ... F
+            c = c - 7;//to get the corect numerical values of the hexadecimal A,B,C,D,E,F
+          }
+        }
+
+        // assert: s contains a decimal number
+        // use base 16 but detect wrap around
+        if (n < UINT64_MAX / 10)
+          n = n + (c * sixteen_to_the_power_of(j));
+        else if (n == UINT64_MAX / 10)
+          if (i <= MAX_HEXADECIMAL_LENGTH)
+            n = n + (c * sixteen_to_the_power_of(j));
+          else {
+            // s contains a hexadecimal number larger than UINT64_MAX
+            printf2("%s: cannot convert out-of-bound hexadecimal number %s\n", selfie_name, s);
+            exit(EXITCODE_SCANNERERROR);
+          }
+        else {
+          // s contains a hexadecimal number larger than UINT64_MAX
+          printf2("%s: cannot convert out-of-bound hexadecimal number %s\n", selfie_name, s);
+          exit(EXITCODE_SCANNERERROR);
+        }
+        // go to the next digit
+        i = i - 1;
+        j = j + 1;
+       // load character (one byte) at index i in s from memory requires
+       // bit shifting since memory access can only be done in double words
+       c = load_character(s, i);
+      }
+ 
+  return n;
 }
 
 uint64_t atoi(char* s) {
@@ -3008,6 +3222,25 @@ uint64_t is_character_digit() {
     return 0;
 }
 
+uint64_t is_character_hex_digit() {
+  // ASCII codes for digits are in a contiguous interval
+  if (character >= '0'){
+    if(character <= 'F'){
+      if(character <= '9'){
+        return 1;
+      }else if(character >= 'A'){
+        return 1;
+      }else{
+        return 0;
+      }
+    }else{
+      return 0;
+    }
+  }else{
+    return 0;
+  }
+}
+
 uint64_t is_character_letter_or_digit_or_underscore() {
   if (is_character_letter())
     return 1;
@@ -3059,6 +3292,108 @@ uint64_t identifier_or_keyword() {
   else
     return SYM_IDENTIFIER;
 }
+
+uint64_t riscu_instruction_or_register_name() {
+  //instruction names
+  if (identifier_string_match(SYM_RISCU_ADDI))
+    return SYM_RISCU_ADDI;
+  else if (identifier_string_match(SYM_RISCU_LUI))
+    return SYM_RISCU_LUI;
+  else if (identifier_string_match(SYM_RISCU_LD))
+    return SYM_RISCU_LD;
+  else if (identifier_string_match(SYM_RISCU_SD))
+    return SYM_RISCU_SD;
+  else if (identifier_string_match(SYM_RISCU_ADD))
+    return SYM_RISCU_ADD;
+  else if (identifier_string_match(SYM_RISCU_SUB))
+    return SYM_RISCU_SUB;
+  else if (identifier_string_match(SYM_RISCU_MUL))
+    return SYM_RISCU_MUL;
+  else if (identifier_string_match(SYM_RISCU_DIVU))
+    return SYM_RISCU_DIVU;
+  else if (identifier_string_match(SYM_RISCU_REMU))
+    return SYM_RISCU_REMU;
+  else if (identifier_string_match(SYM_RISCU_SLTU))
+    return SYM_RISCU_SLTU;
+  else if (identifier_string_match(SYM_RISCU_BEQ))
+    return SYM_RISCU_BEQ;
+  else if (identifier_string_match(SYM_RISCU_JAL))
+    return SYM_RISCU_JAL;
+  else if (identifier_string_match(SYM_RISCU_JALR))
+    return SYM_RISCU_JALR;
+  else if (identifier_string_match(SYM_RISCU_ECALL))
+    return SYM_RISCU_ECALL;
+  //register names
+  else if (identifier_string_match(SYM_RISCU_REG_ZR))
+    return SYM_RISCU_REG_ZR;
+  else if (identifier_string_match(SYM_RISCU_REG_RA))
+    return SYM_RISCU_REG_RA;
+  else if (identifier_string_match(SYM_RISCU_REG_SP))
+    return SYM_RISCU_REG_SP;
+  else if (identifier_string_match(SYM_RISCU_REG_GP))
+    return SYM_RISCU_REG_GP;
+  else if (identifier_string_match(SYM_RISCU_REG_TP))
+    return SYM_RISCU_REG_TP;
+  else if (identifier_string_match(SYM_RISCU_REG_T0))
+    return SYM_RISCU_REG_T0;
+  else if (identifier_string_match(SYM_RISCU_REG_T1))
+    return SYM_RISCU_REG_T1;
+  else if (identifier_string_match(SYM_RISCU_REG_T2))
+    return SYM_RISCU_REG_T2;
+  else if (identifier_string_match(SYM_RISCU_REG_S0))
+    return SYM_RISCU_REG_S0;
+  else if (identifier_string_match(SYM_RISCU_REG_S1))
+    return SYM_RISCU_REG_S1;
+  else if (identifier_string_match(SYM_RISCU_REG_A0))
+    return SYM_RISCU_REG_A0;
+  else if (identifier_string_match(SYM_RISCU_REG_A1))
+    return SYM_RISCU_REG_A1;
+  else if (identifier_string_match(SYM_RISCU_REG_A2))
+    return SYM_RISCU_REG_A2;
+  else if (identifier_string_match(SYM_RISCU_REG_A3))
+    return SYM_RISCU_REG_A3;
+  else if (identifier_string_match(SYM_RISCU_REG_A4))
+    return SYM_RISCU_REG_A4;
+  else if (identifier_string_match(SYM_RISCU_REG_A5))
+    return SYM_RISCU_REG_A5;
+  else if (identifier_string_match(SYM_RISCU_REG_A6))
+    return SYM_RISCU_REG_A6;
+  else if (identifier_string_match(SYM_RISCU_REG_A7))
+    return SYM_RISCU_REG_A7;
+  else if (identifier_string_match(SYM_RISCU_REG_S2))
+    return SYM_RISCU_REG_S2;
+  else if (identifier_string_match(SYM_RISCU_REG_S3))
+    return SYM_RISCU_REG_S3;
+  else if (identifier_string_match(SYM_RISCU_REG_S4))
+    return SYM_RISCU_REG_S4;
+  else if (identifier_string_match(SYM_RISCU_REG_S5))
+    return SYM_RISCU_REG_S5;
+  else if (identifier_string_match(SYM_RISCU_REG_S6))
+    return SYM_RISCU_REG_S6;
+  else if (identifier_string_match(SYM_RISCU_REG_S7))
+    return SYM_RISCU_REG_S7;
+  else if (identifier_string_match(SYM_RISCU_REG_S8))
+    return SYM_RISCU_REG_S8;
+  else if (identifier_string_match(SYM_RISCU_REG_S9))
+    return SYM_RISCU_REG_S9;
+  else if (identifier_string_match(SYM_RISCU_REG_S10))
+    return SYM_RISCU_REG_S10;
+  else if (identifier_string_match(SYM_RISCU_REG_S11))
+    return SYM_RISCU_REG_S11;
+  else if (identifier_string_match(SYM_RISCU_REG_T3))
+    return SYM_RISCU_REG_T3;
+  else if (identifier_string_match(SYM_RISCU_REG_T4))
+    return SYM_RISCU_REG_T4;
+  else if (identifier_string_match(SYM_RISCU_REG_T5))
+    return SYM_RISCU_REG_T5;
+  else if (identifier_string_match(SYM_RISCU_REG_T6))
+    return SYM_RISCU_REG_T6;
+  else if (identifier_string_match(SYM_RISCU_QUAD))
+    return SYM_RISCU_QUAD;
+  else 
+    return NOT_REG_ID;
+}
+
 
 void get_symbol() {
   uint64_t i;
@@ -3297,6 +3632,182 @@ void get_symbol() {
     number_of_scanned_symbols = number_of_scanned_symbols + 1;
   }
 }
+
+void get_riscu_symbol() {
+  uint64_t i;
+
+  // reset previously scanned symbol
+  symbol = SYM_EOF;
+
+  i = 0;
+
+  if (find_next_character() != CHAR_EOF) {
+    if (symbol != SYM_DIVISION) {
+      // '/' may have already been recognized
+      // while looking for whitespace and "//"
+      if (is_character_letter()) {
+        // accommodate identifier and null for termination
+        identifier = string_alloc(MAX_IDENTIFIER_LENGTH);
+
+        i = 0;
+
+        while (is_character_letter_or_digit_or_underscore()) {
+          if (i >= MAX_IDENTIFIER_LENGTH) {
+            syntax_error_message("identifier too long");
+
+            exit(EXITCODE_SCANNERERROR);
+          }
+
+          store_character(identifier, i, character);
+
+          i = i + 1;
+
+          get_character();
+        }
+
+        store_character(identifier, i, 0); // null-terminated string
+
+        symbol = riscu_instruction_or_register_name();
+
+      } else if (is_character_digit()) {
+        // accommodate integer and null for termination
+        integer = string_alloc(MAX_INTEGER_LENGTH);
+
+        if(character == '0'){
+          store_character(integer, i, character);
+          get_character();
+          i = i + 1;
+         
+          if(character == 'x'){
+            store_character(integer, i, character);
+            get_character();
+             i = i + 1;
+
+            while (is_character_hex_digit()){  
+              if (i > MAX_HEXADECIMAL_LENGTH) {
+                if (integer_is_signed){
+                  syntax_error_message("signed hexadecimal number out of bound");
+                }else
+                  syntax_error_message("hexadecimal number out of bound");
+                  exit(EXITCODE_SCANNERERROR);
+               }
+             
+              store_character(integer, i, character);
+              i = i + 1;
+              get_character();
+            }
+
+            store_character(integer, i, 0); // null-terminated string
+            literal = htoi(integer);
+
+          }else{
+
+           while (is_character_digit()) {
+             if (i >= MAX_INTEGER_LENGTH) {
+               if (integer_is_signed)
+                 syntax_error_message("signed integer out of bound");
+               else
+                 syntax_error_message("integer out of bound");
+
+              exit(EXITCODE_SCANNERERROR);
+             }
+
+             store_character(integer, i, character);
+             i = i + 1;
+
+            get_character();
+          }
+
+           store_character(integer, i, 0); // null-terminated string
+           literal = atoi(integer);
+          }
+
+        }else{
+           while (is_character_digit()) {
+             if (i >= MAX_INTEGER_LENGTH) {
+               if (integer_is_signed)
+                 syntax_error_message("signed integer out of bound");
+               else
+                 syntax_error_message("integer out of bound");
+
+              exit(EXITCODE_SCANNERERROR);
+             }
+
+             store_character(integer, i, character);
+             i = i + 1;
+
+            get_character();
+          }
+
+           store_character(integer, i, 0); // null-terminated string
+           literal = atoi(integer);
+        }  
+
+        if (integer_is_signed)
+          if (literal > INT64_MIN) {
+              syntax_error_message("signed integer out of bound");
+
+              exit(EXITCODE_SCANNERERROR);
+          }
+
+        symbol = SYM_INTEGER;
+      
+      } else if (character == CHAR_COMMA) {
+        get_character();
+
+        symbol = SYM_RISCU_COMMA;
+
+      } else if (character == CHAR_LPARENTHESIS) {
+        get_character();
+
+        symbol = SYM_RISCU_LPARENTHESIS;
+
+      } else if (character == CHAR_RPARENTHESIS) {
+        get_character();
+
+        symbol = SYM_RISCU_RPARENTHESIS;
+        
+      } else if (character == CHAR_RISCU_DOT) {
+        get_character();
+        if(character == 'q'){
+          get_character();
+          if(character == 'u'){
+            get_character();
+            if(character == 'a'){
+              get_character();
+              if(character == 'd'){
+                symbol = SYM_RISCU_QUAD;
+                get_character();
+              }else{
+                 syntax_error_character('d');
+              }
+            }else{
+              syntax_error_character('a');
+            }
+          }else{
+            syntax_error_character('u');
+          }
+        }else{
+          syntax_error_character('q');
+        }
+        
+      } else if (character == CHAR_DASH) {
+        get_character();
+
+        symbol = SYM_MINUS;
+      } else {
+        print_line_number("syntax error", line_number);
+        print("found unknown character ");
+        print_character(character);
+        println();
+
+        exit(EXITCODE_SCANNERERROR);
+      }
+    }
+
+    number_of_scanned_symbols = number_of_scanned_symbols + 1;
+  }
+ }
 
 void handle_escape_sequence() {
   // ignoring the backslash
@@ -8541,6 +9052,578 @@ void selfie_disassemble(uint64_t verbose) {
     assembly_name);
 }
 
+
+// -----------------------------------------------------------------
+// -------------------------- ASSEMBLER -------------------------
+// -----------------------------------------------------------------
+
+void selfie_assemble(){
+  uint64_t link;
+  uint64_t number_of_source_files;
+  uint64_t fetch_dss_code_location;
+
+  fetch_dss_code_location = 0;
+
+  // link until next console option
+  link = 1;
+
+  number_of_source_files = 0;
+
+  source_name = "library";
+
+  binary_name = source_name;
+
+  // allocate memory for storing binary
+  binary        = zmalloc(MAX_BINARY_LENGTH);
+  binary_length = 0;
+
+  // reset code length
+  code_length = 0;
+
+  // allocate zeroed memory for storing source code line numbers
+  code_line_number = zmalloc(MAX_CODE_LENGTH / INSTRUCTIONSIZE * SIZEOFUINT64);
+  data_line_number = zmalloc(MAX_DATA_LENGTH / WORDSIZE * SIZEOFUINT64);
+ 
+  reset_symbol_tables();
+  reset_instruction_counters();
+
+  emit_program_entry();
+
+  // emit system call wrappers
+  // exit code must be first
+  emit_exit();
+  emit_read();
+  emit_write();
+  emit_open();
+
+  emit_malloc();
+
+  emit_switch();
+
+  if (GC_ON) {
+    emit_fetch_stack_pointer();
+    emit_fetch_global_pointer();
+
+    // save code location of eventual fetch_data_segment_size implementation
+    fetch_dss_code_location = binary_length;
+
+    emit_fetch_data_segment_size_interface();
+  }
+
+  while (link) {
+    if (number_of_remaining_arguments() == 0)
+      link = 0;
+    else if (load_character(peek_argument(0), 0) == '-')
+      link = 0;
+    else {
+      source_name = get_argument();
+
+      number_of_source_files = number_of_source_files + 1;
+
+      printf2("%s: selfie assembling %s with riscu\n", selfie_name, source_name);
+
+      source_fd = sign_extend(open(source_name, O_RDONLY, 0), SYSCALL_BITWIDTH);
+
+      if (signed_less_than(source_fd, 0)) {
+        printf2("%s: could not open input file %s\n", selfie_name, source_name);
+
+        exit(EXITCODE_IOERROR);
+      }
+
+      reset_scanner();
+      get_riscu_symbol();
+      parse_riscu();
+
+      printf4("%s: %u characters read in %u lines and %u comments\n", selfie_name,
+        (char*) number_of_read_characters,
+        (char*) line_number,
+        (char*) number_of_comments);
+
+      printf4("%s: with %u(%.2u%%) characters in %u actual symbols\n", selfie_name,
+        (char*) (number_of_read_characters - number_of_ignored_characters),
+        (char*) fixed_point_percentage(fixed_point_ratio(number_of_read_characters, number_of_read_characters - number_of_ignored_characters, 4), 4),
+        (char*) number_of_scanned_symbols); 
+    }
+  }
+
+  if (number_of_source_files == 0)
+    printf1("%s: nothing to assemble, only library generated\n", selfie_name);
+
+  emit_bootstrapping();
+
+  if (GC_ON)
+    emit_fetch_data_segment_size_implementation(fetch_dss_code_location);
+
+  emit_data_segment();
+
+  ELF_header = create_elf_header(binary_length, code_length);
+  entry_point = ELF_ENTRY_POINT;
+  print_instruction_counters();
+}
+
+void parse_riscu(){
+  while (symbol != SYM_EOF){
+    get_instruction();
+  }
+}
+
+void get_instruction(){  
+  if(is_init_instruction()){
+    parse_init_instruction();   
+  }else if (is_memory_instruction()){
+    parse_memory_instruction();  
+  }else if (is_arithmetic_or_comparison_instruction()){
+    parse_arithmetic_or_comparison_instruction();
+  }else if (is_control_instruction()){
+    parse_control_instruction();
+  }else if (is_system_instruction()){ 
+    parse_system_instruction();
+  }else if (is_data_segment_keyword()){
+      get_riscu_symbol();
+    parse_data_segment();
+  }else {
+   syntax_error_message("wrong instruction name");
+  }
+  get_riscu_symbol();
+}
+
+void parse_init_instruction(){
+  uint64_t instruction_name;
+  uint64_t first_register_id;
+  uint64_t second_register_id;
+  uint64_t imm;
+  uint64_t negative;
+
+  negative = 0;
+
+  instruction_name = symbol;
+
+  get_riscu_symbol();
+  if(get_register_id() != NOT_REG_ID){
+    first_register_id = get_register_id();
+     
+    get_riscu_symbol();
+    if(symbol == SYM_RISCU_COMMA){
+       
+      get_riscu_symbol();
+      if(instruction_name == SYM_RISCU_LUI){
+
+        get_riscu_symbol();
+        if (symbol == SYM_MINUS) {
+              literal = -literal;
+              negative = 1;
+              get_riscu_symbol();
+        }
+
+        if(symbol == SYM_INTEGER){
+          if(negative){
+            imm = -literal;
+            negative = 0;
+          }else{
+            imm = literal;
+          }
+        }else{
+          syntax_error_symbol(SYM_INTEGER);
+        }
+      }
+      
+      if(instruction_name == SYM_RISCU_ADDI){
+        if(get_register_id() != NOT_REG_ID){
+          second_register_id = get_register_id();
+
+          get_riscu_symbol();
+          if(symbol == SYM_RISCU_COMMA){
+            
+            get_riscu_symbol();
+            if (symbol == SYM_MINUS) {
+              literal = -literal;
+              negative = 1;
+              get_riscu_symbol();
+            }
+
+            if(symbol == SYM_INTEGER){
+              if(negative){
+                imm = -literal;
+                negative = 0;
+              }else{
+                imm = literal;
+              }
+            }else{
+              syntax_error_symbol(SYM_INTEGER);
+            }
+
+          }else{
+             syntax_error_symbol(SYM_RISCU_COMMA);
+          }
+
+        }else{
+          syntax_error_message("wrong register name");
+        }
+      }
+    }else{
+      syntax_error_symbol(SYM_RISCU_COMMA);
+    }
+  }else{
+    syntax_error_message("wrong register name");
+  }
+  //emit instruction goes here
+}
+
+void parse_memory_instruction(){
+  uint64_t instruction_name;
+  uint64_t register_id;
+  uint64_t memory_address;
+
+  instruction_name = symbol;
+
+  get_riscu_symbol();
+  if(get_register_id() != NOT_REG_ID){
+    register_id = get_register_id();
+
+    get_riscu_symbol();
+    if(symbol == SYM_RISCU_COMMA){
+
+      get_riscu_symbol(); print("parse_memory_instruction, SYM_COMMA");
+      memory_address = parse_memory_address();
+
+    }else{
+       syntax_error_symbol(SYM_RISCU_COMMA);
+    }
+  }else{
+    syntax_error_message("wrong register name");
+  }
+}
+
+void parse_arithmetic_or_comparison_instruction(){
+  uint64_t instruction_name;
+  uint64_t first_register_id;
+  uint64_t second_register_id;
+  uint64_t third_register_id;
+
+  instruction_name = symbol;
+  get_riscu_symbol();
+  if(get_register_id() != NOT_REG_ID){
+    first_register_id = get_register_id();
+     
+    get_riscu_symbol();
+    if(symbol == SYM_RISCU_COMMA){
+       
+      get_riscu_symbol();
+      if(get_register_id() != NOT_REG_ID){
+        second_register_id = get_register_id();
+       
+        get_riscu_symbol();
+        if(symbol == SYM_RISCU_COMMA){
+          
+          get_riscu_symbol();
+          if(get_register_id() != NOT_REG_ID){
+            third_register_id = get_register_id();
+            //emit instruction here
+          }else{
+            syntax_error_message("wrong register name");
+          }
+        }else{
+          syntax_error_symbol(SYM_RISCU_COMMA);
+        }
+      }else{
+        syntax_error_message("wrong register name");
+      }
+    }else{
+     syntax_error_symbol(SYM_RISCU_COMMA);
+    }
+  }else{
+    syntax_error_message("wrong register name");
+  }
+  //emit instruction goes here
+}
+
+void parse_control_instruction(){
+  uint64_t instruction_name;
+  uint64_t first_register_id;
+  uint64_t second_register_id;
+  uint64_t imm;
+  uint64_t memory_address;
+  uint64_t negative;
+
+  negative = 0;
+  instruction_name = symbol;
+
+  get_riscu_symbol();
+  if(get_register_id() != NOT_REG_ID){
+    first_register_id = get_register_id();
+
+    get_riscu_symbol();
+    if(symbol == SYM_RISCU_COMMA){
+
+      get_riscu_symbol();
+      if(instruction_name == SYM_RISCU_BEQ){
+        if(get_register_id() != NOT_REG_ID){
+          second_register_id = get_register_id();
+
+          get_riscu_symbol();
+          if(symbol == SYM_RISCU_COMMA){
+            
+            get_riscu_symbol();
+            
+            if (symbol == SYM_MINUS) {
+              literal = -literal;
+              negative = 1;
+              get_riscu_symbol();
+            }
+            if(symbol == SYM_INTEGER){
+              if(negative){
+                imm = -literal;
+                negative = 0;
+              }else{
+                imm = literal;
+              }
+              //emit beq instruction here
+            }else{
+              syntax_error_symbol(SYM_INTEGER);
+            }
+          }else{
+            syntax_error_symbol(SYM_RISCU_COMMA);
+          }
+        }else{
+          syntax_error_message("wrong register name");
+        }
+      }
+      if(instruction_name == SYM_RISCU_JAL){
+        if (symbol == SYM_MINUS) {
+          literal = -literal;
+          negative = 1;
+          get_riscu_symbol();
+        }
+
+        if(symbol == SYM_INTEGER){
+          if(negative){
+            imm = -literal;
+            negative = 0;
+          }else{
+            imm = literal;
+          }
+          //emit jal instruction here
+        }else{
+          syntax_error_symbol(SYM_INTEGER);
+        }
+      }
+
+      if(instruction_name == SYM_RISCU_JALR){
+         memory_address = parse_memory_address();
+         //emit jalr instruction here
+      }
+
+    }else{
+      syntax_error_symbol(SYM_RISCU_COMMA);
+    }
+
+  }else{
+    syntax_error_message("wrong register name");
+  }
+}
+
+
+uint64_t parse_memory_address(){
+  uint64_t first_register;
+  uint64_t imm;
+  uint64_t negative;
+
+  negative = 0;
+
+  if (symbol == SYM_MINUS) {
+      literal = -literal;
+      negative = 1;
+      get_riscu_symbol();
+  }
+
+  if(symbol == SYM_INTEGER){
+    if(negative){
+      imm = -literal;
+      negative = 0;
+    }else{
+      imm = literal;
+    }
+    get_riscu_symbol();
+    if(symbol == SYM_RISCU_LPARENTHESIS){
+
+      get_riscu_symbol();
+      if(get_register_id() != NOT_REG_ID){
+        first_register = get_register_id();
+
+        get_riscu_symbol();
+        if(symbol == SYM_RISCU_RPARENTHESIS){
+          return imm * WORDSIZE + first_register;
+        }else{
+          syntax_error_symbol(SYM_RISCU_RPARENTHESIS);
+          return 0;
+        }
+      }else{
+        syntax_error_message("wrong register name");
+      }
+    }else{
+      syntax_error_symbol(SYM_RISCU_LPARENTHESIS);
+    }
+  }else{
+    syntax_error_symbol(SYM_INTEGER);
+  }
+   return 0;
+}
+
+void parse_system_instruction(){
+  //emit ecall instruction here
+}
+
+void parse_data_segment(){
+       if (symbol == SYM_MINUS) {
+          literal = -literal;
+          get_riscu_symbol();
+        }
+
+       if(symbol == SYM_INTEGER){
+         get_riscu_symbol(); 
+        }else{ 
+          syntax_error_symbol(SYM_INTEGER); 
+        }
+}
+
+uint64_t is_init_instruction(){
+  if(symbol == SYM_RISCU_LUI){
+    return 1;
+  }else if(symbol == SYM_RISCU_ADDI){
+    return 1;
+  }else{
+    return 0;
+  }
+}
+
+uint64_t is_memory_instruction(){
+  if(symbol == SYM_RISCU_LD){
+    return 1;
+  }else if(symbol == SYM_RISCU_SD){
+    return 1;
+  }else{
+    return 0;
+  }
+}
+
+uint64_t is_arithmetic_or_comparison_instruction(){
+  if(symbol == SYM_RISCU_ADD){
+    return 1;
+  }else if(symbol == SYM_RISCU_SUB){
+    return 1;
+  }else if(symbol == SYM_RISCU_MUL){
+    return 1;
+  }else if(symbol == SYM_RISCU_DIVU){
+    return 1;
+  }else if(symbol == SYM_RISCU_REMU){
+    return 1;
+  }else if(symbol == SYM_RISCU_SLTU){
+    return 1;
+  }else {
+    return 0;
+  }
+}
+
+uint64_t is_control_instruction(){
+  if(symbol == SYM_RISCU_BEQ){
+    return 1;
+  }else if(symbol == SYM_RISCU_JAL){
+    return 1;
+  }else if(symbol == SYM_RISCU_JALR){
+    return 1;
+  }else {
+    return 0;
+  }
+}
+
+uint64_t is_system_instruction(){
+  if(symbol == SYM_RISCU_ECALL){
+    return 1;
+  }else{
+    return 0;
+  }
+}
+
+uint64_t is_data_segment_keyword(){
+  if(symbol == SYM_RISCU_QUAD){
+    return 1;
+  }else{
+    return 0;
+  }
+}
+
+uint64_t get_register_id(){
+  if(symbol == SYM_RISCU_REG_ZR){
+    return REG_ZR;
+  }else if (symbol == SYM_RISCU_REG_RA){
+    return REG_RA;
+  }else if (symbol == SYM_RISCU_REG_SP){
+    return REG_SP;
+  }else if (symbol == SYM_RISCU_REG_GP){
+    return REG_GP;
+  }else if (symbol == SYM_RISCU_REG_TP){
+    return REG_TP;
+  }else if (symbol == SYM_RISCU_REG_T0){
+    return REG_T0;
+  }else if (symbol == SYM_RISCU_REG_T1){
+    return REG_T1;
+  }else if (symbol == SYM_RISCU_REG_T2){
+    return REG_T2;
+  }else if (symbol == SYM_RISCU_REG_S0){
+    return REG_S0;
+  }else if (symbol == SYM_RISCU_REG_S1){
+    return REG_S1;
+  }else if (symbol == SYM_RISCU_REG_A0){
+    return REG_A0;
+  }else if (symbol == SYM_RISCU_REG_A1){
+    return REG_A1;
+  }else if (symbol == SYM_RISCU_REG_A2){
+    return REG_A2;
+  }else if (symbol == SYM_RISCU_REG_A3){
+    return REG_A3;
+  }else if (symbol == SYM_RISCU_REG_A4){
+    return REG_A4;
+  }else if (symbol == SYM_RISCU_REG_A5){
+    return REG_A5;
+  }else if (symbol == SYM_RISCU_REG_A6){
+    return REG_A6;
+  }else if (symbol == SYM_RISCU_REG_A7){
+    return REG_A7;
+  }else if (symbol == SYM_RISCU_REG_S2){
+    return REG_S2;
+  }else if (symbol == SYM_RISCU_REG_S3){
+    return REG_S3;
+  }else if (symbol == SYM_RISCU_REG_S4){
+    return REG_S4;
+  }else if (symbol == SYM_RISCU_REG_S5){
+    return REG_S5;
+  }else if (symbol == SYM_RISCU_REG_S6){
+    return REG_S6;
+  }else if (symbol == SYM_RISCU_REG_S7){
+    return REG_S7;
+  }else if (symbol == SYM_RISCU_REG_S8){
+    return REG_S8;
+  }else if (symbol == SYM_RISCU_REG_S9){
+    return REG_S9;
+  }else if (symbol == SYM_RISCU_REG_S10){
+    return REG_S10;
+  }else if (symbol == SYM_RISCU_REG_S11){
+    return REG_S11;
+  }else if (symbol == SYM_RISCU_REG_T3){
+    return REG_T3;
+  }else if (symbol == SYM_RISCU_REG_T4){
+    return REG_T4;
+  }else if (symbol == SYM_RISCU_REG_T5){
+    return REG_T5;
+  }else if (symbol == SYM_RISCU_REG_T6){
+    return REG_T6;
+  }else{
+    return NOT_REG_ID;
+  }
+}
+
+
+
 // -----------------------------------------------------------------
 // -------------------------- REPLAY ENGINE ------------------------
 // -----------------------------------------------------------------
@@ -10194,7 +11277,7 @@ uint64_t no_or_bad_or_more_arguments(uint64_t exit_code) {
 }
 
 void print_synopsis(char* extras) {
-  printf2("synopsis: %s { -c { source } | -o binary | [ -s | -S ] assembly | -l binary }%s\n", selfie_name, extras);
+  printf2("synopsis: %s { -c { source } | -o binary | [ -s | -S ] -a assembly | -l binary }%s\n", selfie_name, extras);
 }
 
 // -----------------------------------------------------------------
@@ -10221,6 +11304,8 @@ uint64_t selfie(uint64_t extras) {
         return EXITCODE_BADARGUMENTS;
       else if (string_compare(argument, "-o"))
         selfie_output(get_argument());
+      else if (string_compare(argument, "-a"))
+        selfie_assemble();
       else if (string_compare(argument, "-s"))
         selfie_disassemble(0);
       else if (string_compare(argument, "-S"))
